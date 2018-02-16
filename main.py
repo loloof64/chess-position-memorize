@@ -10,7 +10,7 @@ class MainWindow(Tk):
 		self._add_widgets()
 
 		self._pieces_images_list = []
-		self.load_position("c8f4", "  k / ppp/    /QB R/    ")
+		self.load_position("d8h4", "  rk /  pp /     /     /B Q R")
 
 		self._update_board()
 
@@ -67,7 +67,7 @@ class MainWindow(Tk):
 		is_white_cell = (absolute_coord[0] + absolute_coord[1]) %2 != 0
 		bg_color = '#f5f6ce' if is_white_cell else '#CD853F'
 
-		square_y = (self._board_size[0] - cell_coord[0] + 0.5) * MainWindow.PICTURES_SIZE
+		square_y = (cell_coord[0] + 0.5) * MainWindow.PICTURES_SIZE
 		square_x = (cell_coord[1] + 0.5) * MainWindow.PICTURES_SIZE
 
 		self._canvas.create_rectangle(
