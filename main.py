@@ -40,7 +40,7 @@ class MainWindow(Tk):
 		self._load_button = Button(self, text="Load position")
 		top_paned_window.add(self._load_button)
 
-		self._ready_button = Button(self, text="I'm ready", command=self._toggle_playing_state)
+		self._ready_button = Button(self, text="I'm ready", command=lambda: self._toggle_playing_state())
 		top_paned_window.add(self._ready_button)
 
 		self._bin_image = PhotoImage(file = "bin.png")
@@ -79,6 +79,20 @@ class MainWindow(Tk):
 		self._white_king_button = Button(self, image = self._pieces_images_list["WhiteKing"])
 		self._white_pieces_buttons.add(self._white_king_button)
 
+		self._bin_button.config(command=lambda: self._set_editing_piece(""))
+		self._black_pawn_button.config(command=lambda: self._set_editing_piece("BlackPawn"))
+		self._black_knight_button.config(command=lambda: self._set_editing_piece("BlackKnight"))
+		self._black_bishop_button.config(command=lambda: self._set_editing_piece("BlackBishop"))
+		self._black_rook_button.config(command=lambda: self._set_editing_piece("BlackRook"))
+		self._black_queen_button.config(command=lambda: self._set_editing_piece("BlackQueen"))
+		self._black_king_button.config(command=lambda: self._set_editing_piece("BlackKing"))
+		self._white_pawn_button.config(command=lambda: self._set_editing_piece("WhitePawn"))
+		self._white_knight_button.config(command=lambda: self._set_editing_piece("WhiteKnight"))
+		self._white_bishop_button.config(command=lambda: self._set_editing_piece("WhiteBishop"))
+		self._white_rook_button.config(command=lambda: self._set_editing_piece("WhiteRook"))
+		self._white_queen_button.config(command=lambda: self._set_editing_piece("WhiteQueen"))
+		self._white_king_button.config(command=lambda: self._set_editing_piece("WhiteKing"))
+
 		self._canvas = Canvas(self,
 			width=MainWindow.PICTURES_SIZE*9,
 			height=MainWindow.PICTURES_SIZE*9,
@@ -97,8 +111,42 @@ class MainWindow(Tk):
 		else :
 			self._expected_position = self._pieces
 			self._clear_board()
+			self._set_editing_piece("")
 			self._playing_mode = True
 		self._update_widgets()
+
+	def _set_editing_piece(self, piece):
+		self._editing_piece = piece
+		self._update_pieces_buttons()
+
+	def _update_pieces_buttons(self):
+		self._bin_button.config(relief="sunken" if self._editing_piece == "" else "groove",
+		bg="red" if self._editing_piece == "" else "gray")
+		self._white_pawn_button.config(relief="sunken" if self._editing_piece == "WhitePawn" else "groove",
+		bg="red" if self._editing_piece == "WhitePawn" else "gray")
+		self._white_knight_button.config(relief="sunken" if self._editing_piece == "WhiteKnight" else "groove",
+		bg="red" if self._editing_piece == "WhiteKnight" else "gray")
+		self._white_bishop_button.config(relief="sunken" if self._editing_piece == "WhiteBishop" else "groove",
+		bg="red" if self._editing_piece == "WhiteBishop" else "gray")
+		self._white_rook_button.config(relief="sunken" if self._editing_piece == "WhiteRook" else "groove",
+		bg="red" if self._editing_piece == "WhiteRook" else "gray")
+		self._white_queen_button.config(relief="sunken" if self._editing_piece == "WhiteQueen" else "groove",
+		bg="red" if self._editing_piece == "WhiteQueen" else "gray")
+		self._white_king_button.config(relief="sunken" if self._editing_piece == "WhiteKing" else "groove",
+		bg="red" if self._editing_piece == "WhiteKing" else "gray")
+		self._black_pawn_button.config(relief="sunken" if self._editing_piece == "BlackPawn" else "groove",
+		bg="red" if self._editing_piece == "BlackPawn" else "gray")
+		self._black_knight_button.config(relief="sunken" if self._editing_piece == "BlackKnight" else "groove",
+		bg="red" if self._editing_piece == "BlackKnight" else "gray")
+		self._black_bishop_button.config(relief="sunken" if self._editing_piece == "BlackBishop" else "groove",
+		bg="red" if self._editing_piece == "BlackBishop" else "gray")
+		self._black_rook_button.config(relief="sunken" if self._editing_piece == "BlackRook" else "groove",
+		bg="red" if self._editing_piece == "BlackRook" else "gray")
+		self._black_queen_button.config(relief="sunken" if self._editing_piece == "BlackQueen" else "groove",
+		bg="red" if self._editing_piece == "BlackQueen" else "gray")
+		self._black_king_button.config(relief="sunken" if self._editing_piece == "BlackKing" else "groove",
+		bg="red" if self._editing_piece == "BlackKing" else "gray")
+
 
 	def _clear_board(self):
 		new_position = "/".join(["".join([" " for i in range(self._board_size[1])]) for j in range(self._board_size[0])])
