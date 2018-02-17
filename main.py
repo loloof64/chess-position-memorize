@@ -99,10 +99,60 @@ class MainWindow(Tk):
 			bg = '#128812'
 		)
 		self._canvas.pack(side=BOTTOM)
+		self._canvas.bind("<Button-1>", self._update_canvas_on_click)
 
 		self._white_pieces_buttons.pack_forget()
 		self._black_pieces_buttons.pack_forget()
 		self._bin_button.pack_forget()
+
+	def _update_canvas_on_click(self, event):
+		if self._playing_mode :
+			event_in_bounds = (
+				event.x >= MainWindow.PICTURES_SIZE * 0.5 and
+				event.x <= MainWindow.PICTURES_SIZE * (0.5+ self._board_size[0]) and
+				event.y >= MainWindow.PICTURES_SIZE * 0.5 and
+				event.y <= MainWindow.PICTURES_SIZE * (0.5+ self._board_size[1])
+				)
+
+			if event_in_bounds:
+				cell_x = int((event.x - MainWindow.PICTURES_SIZE*0.5) / MainWindow.PICTURES_SIZE)
+				cell_y = int((event.y - MainWindow.PICTURES_SIZE*0.5) / MainWindow.PICTURES_SIZE)
+
+				self._update_piece_at_relative_coords(cell_x, cell_y)
+
+	def _update_piece_at_relative_coords(self, cell_x, cell_y):
+		new_piece_code = self._get_editing_piece_code()
+		old_piece_code = self._pieces_codes[cell_y][cell_x]
+		self._pieces_codes[cell_y][cell_x] = new_piece_code if (old_piece_code != new_piece_code) else ""
+		self._update_board()
+
+	def _get_editing_piece_code(self):
+		if self._editing_piece == "" :
+			return ""
+		if self._editing_piece == "WhitePawn" :
+			return 'P'
+		if self._editing_piece == "WhiteKnight" :
+			return 'N'
+		if self._editing_piece == "WhiteBishop" :
+			return 'B'
+		if self._editing_piece == "WhiteRook" :
+			return 'R'
+		if self._editing_piece == "WhiteQueen" :
+			return 'Q'
+		if self._editing_piece == "WhiteKing" :
+			return 'K'
+		if self._editing_piece == "BlackPawn" :
+			return 'p'
+		if self._editing_piece == "BlackKnight" :
+			return 'n'
+		if self._editing_piece == "BlackBishop" :
+			return 'b'
+		if self._editing_piece == "BlackRook" :
+			return 'r'
+		if self._editing_piece == "BlackQueen" :
+			return 'q'
+		if self._editing_piece == "BlackKing" :
+			return 'k'
 
 	def _toggle_playing_state(self):
 		if self._playing_mode :
@@ -152,7 +202,7 @@ class MainWindow(Tk):
 		new_position = "/".join(["".join([" " for i in range(self._board_size[1])]) for j in range(self._board_size[0])])
 		self.load_position(self._corner_cells, new_position)
 
-	def _update_board(self):
+	def _update_board(self):#
 		self._canvas.delete("all")
 		self._compute_board_size()
 		self._compute_top_left_cell_absolute_coords()
