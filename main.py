@@ -10,8 +10,10 @@ class MainWindow(Tk):
 		self._create_pictures()
 		self._add_widgets()
 		self._playing_mode = False
+		self._error_mode = False
 
 		self.load_position("d8h4", "  rk /  pp /     /     /B Q R")
+		self._clear_errors()
 
 		self._update_board()
 
@@ -19,7 +21,11 @@ class MainWindow(Tk):
 		self._pieces = pieces
 		self._corner_cells = corner_cells
 		self._pieces_codes = list(map(lambda x: list(x), self._pieces.split("/")))
+		self._clear_errors()
 		self._update_board()
+
+	def _clear_errors(self):
+		self._errors = [[False for cell in line] for line in self._pieces_codes]
 
 	def _update_widgets(self):
 		if self._playing_mode :
@@ -156,14 +162,37 @@ class MainWindow(Tk):
 
 	def _toggle_playing_state(self):
 		if self._playing_mode :
-			self.load_position(self._corner_cells, self._expected_position)
+			self._update_errors()
+			self._pieces_codes =  list(map(lambda x: list(x), self._expected_position.split("/")))
+			self._update_board()
 			self._playing_mode = False
+			errors_count = sum(map(lambda line: sum(line), [[1 if error else 0 for error in line] for line in self._errors]))
+			self._error_mode = errors_count > 0
+			self._ready_button['text'] = "Understood" if self._error_mode else "I'm ready"
+			if not self._error_mode:
+				self.load_position(self._corner_cells, self._expected_position)
+				self._update_widgets()
+			else:
+				self._update_board()
 		else :
-			self._expected_position = self._pieces
-			self._clear_board()
-			self._set_editing_piece("")
-			self._playing_mode = True
-		self._update_widgets()
+			if self._error_mode:
+				self._error_mode = False
+				self._ready_button['text'] = "I'm ready"
+				self.load_position(self._corner_cells, self._expected_position)
+				self._update_board()
+			else:
+				self._expected_position = self._pieces
+				self._clear_board()
+				self._set_editing_piece("")
+				self._playing_mode = True
+				self._update_widgets()
+
+	def _update_errors(self):
+		expected_pieces = list(map(lambda x: list(x), self._expected_position.split("/")))
+		for cell_y in range(len(self._pieces_codes)) :
+			for cell_x in range(len(self._pieces_codes[cell_y])) :
+				self._errors[cell_y][cell_x] = expected_pieces[cell_y][cell_x] != self._pieces_codes[cell_y][cell_x]
+		self._update_board()
 
 	def _set_editing_piece(self, piece):
 		self._editing_piece = piece
@@ -202,7 +231,7 @@ class MainWindow(Tk):
 		new_position = "/".join(["".join([" " for i in range(self._board_size[1])]) for j in range(self._board_size[0])])
 		self.load_position(self._corner_cells, new_position)
 
-	def _update_board(self):#
+	def _update_board(self):
 		self._canvas.delete("all")
 		self._compute_board_size()
 		self._compute_top_left_cell_absolute_coords()
@@ -238,7 +267,7 @@ class MainWindow(Tk):
 		)
 
 		is_white_cell = (absolute_coord[0] + absolute_coord[1]) %2 != 0
-		bg_color = '#f5f6ce' if is_white_cell else '#CD853F'
+		bg_color = 'red' if self._errors[cell_coord[0]][cell_coord[1]] else '#f5f6ce' if is_white_cell else '#CD853F'
 
 		square_y = (cell_coord[0] + 0.5) * MainWindow.PICTURES_SIZE
 		square_x = (cell_coord[1] + 0.5) * MainWindow.PICTURES_SIZE
