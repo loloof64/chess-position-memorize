@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.filedialog import *
 
 class MainWindow(Tk):
 
@@ -12,17 +13,30 @@ class MainWindow(Tk):
 		self._playing_mode = False
 		self._error_mode = False
 
-		self.load_position("d8h4", "  rk /  pp /     /     /B Q R")
+		self._load_position("d8h4", "  rk /  pp /     /     /B Q R")
 		self._clear_errors()
 
 		self._update_board()
 
-	def load_position(self, corner_cells, pieces):
+	def _load_position(self, corner_cells, pieces):
 		self._pieces = pieces
 		self._corner_cells = corner_cells
 		self._pieces_codes = list(map(lambda x: list(x), self._pieces.split("/")))
 		self._clear_errors()
 		self._update_board()
+
+	def _open_file(self):
+		file_path = askopenfilename(title="Open a file",filetypes=[('text file','*.txt'),('all files','*')])
+		if file_path != () and file_path != '' :
+			self._load_position_from_file(file_path)
+
+	def _load_position_from_file(self, file_path):
+		with open(file_path, 'r') as file :
+			file_data = file.read().split("\n")
+			self._playing_mode = False
+			self._error_mode = False
+			self._clear_errors()
+			self._load_position(file_data[0], file_data[1])
 
 	def _clear_errors(self):
 		self._errors = [[False for cell in line] for line in self._pieces_codes]
@@ -43,7 +57,7 @@ class MainWindow(Tk):
 		top_paned_window = PanedWindow(self, orient=HORIZONTAL)
 		top_paned_window.pack(side=TOP)
 
-		self._load_button = Button(self, text="Load position")
+		self._load_button = Button(self, text="Load position", command=lambda: self._open_file())
 		top_paned_window.add(self._load_button)
 
 		self._ready_button = Button(self, text="I'm ready", command=lambda: self._toggle_playing_state())
@@ -170,7 +184,7 @@ class MainWindow(Tk):
 			self._error_mode = errors_count > 0
 			self._ready_button['text'] = "Understood" if self._error_mode else "I'm ready"
 			if not self._error_mode:
-				self.load_position(self._corner_cells, self._expected_position)
+				self._load_position(self._corner_cells, self._expected_position)
 				self._update_widgets()
 			else:
 				self._update_board()
@@ -178,7 +192,7 @@ class MainWindow(Tk):
 			if self._error_mode:
 				self._error_mode = False
 				self._ready_button['text'] = "I'm ready"
-				self.load_position(self._corner_cells, self._expected_position)
+				self._load_position(self._corner_cells, self._expected_position)
 				self._update_board()
 			else:
 				self._expected_position = self._pieces
@@ -229,7 +243,7 @@ class MainWindow(Tk):
 
 	def _clear_board(self):
 		new_position = "/".join(["".join([" " for i in range(self._board_size[1])]) for j in range(self._board_size[0])])
-		self.load_position(self._corner_cells, new_position)
+		self._load_position(self._corner_cells, new_position)
 
 	def _update_board(self):
 		self._canvas.delete("all")
