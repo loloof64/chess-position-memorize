@@ -91,8 +91,18 @@ class MainWindow(Tk):
 		self._bin_button.pack_forget()
 
 	def _toggle_playing_state(self):
-		self._playing_mode = not self._playing_mode
+		if self._playing_mode :
+			self.load_position(self._corner_cells, self._expected_position)
+			self._playing_mode = False
+		else :
+			self._expected_position = self._pieces
+			self._clear_board()
+			self._playing_mode = True
 		self._update_widgets()
+
+	def _clear_board(self):
+		new_position = "/".join(["".join([" " for i in range(self._board_size[1])]) for j in range(self._board_size[0])])
+		self.load_position(self._corner_cells, new_position)
 
 	def _update_board(self):
 		self._canvas.delete("all")
