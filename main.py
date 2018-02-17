@@ -26,7 +26,7 @@ class MainWindow(Tk):
 		self._update_board()
 
 	def _open_file(self):
-		file_path = askopenfilename(title="Open a file",filetypes=[('text file','*.txt'),('all files','*')])
+		file_path = askopenfilename(title="Open a file",filetypes=[('all text files','*')])
 		if file_path != () and file_path != '' :
 			self._load_position_from_file(file_path)
 
